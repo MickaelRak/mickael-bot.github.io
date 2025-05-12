@@ -9,34 +9,155 @@
       50% { transform: scale(1.2); opacity: 0.6; }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
     .pulsing {
       animation: pulse 1s infinite;
     }
+
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9999;
+      background: #6d28d9;
+      color: white;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(109, 40, 217, 0.6);
+    }
+
+    #chat-container {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      left: 20px;
+      width: 340px;
+      height: 460px;
+      background: #111827;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chat-header {
+      background: #1f2937;
+      color: white;
+      padding: 12px;
+      font-weight: 600;
+      text-align: center;
+      border-bottom: 1px solid #374151;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 14px;
+      color: white;
+      scrollbar-width: thin;
+      scrollbar-color: #6d28d9 #1f2937;
+    }
+
+    #chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background-color: #6d28d9;
+      border-radius: 3px;
+    }
+
+    .chat-bubble-wrapper {
+      display: flex;
+      margin: 5px 0;
+    }
+
+    .chat-bubble {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 1rem;
+      display: inline-block;
+      word-wrap: break-word;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .user-bubble {
+      background: #6d28d9;
+      align-self: flex-end;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .bot-bubble {
+      background: #374151;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    .error-bubble {
+      background: #991b1b;
+    }
+
+    .chat-footer {
+      display: flex;
+      border-top: 1px solid #374151;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 10px;
+      background: #1f2937;
+      color: white;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #mic-button {
+      background: #374151;
+      color: white;
+    }
   </style>
 </head>
-<body style="margin: 0;">
+<body>
 
 <!-- Bouton d'ouverture du chat -->
-<div id="chat-toggle" onclick="toggleChat()" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #4c1d95; color: white; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-  💬
-</div>
+<div id="chat-toggle" onclick="toggleChat()">💬</div>
 
 <!-- Boîte de chat flottante -->
-<div id="chat-container" style="display: none; position: fixed; bottom: 90px; left: 20px; width: 320px; height: 420px; background: #1f2937; border-radius: 1rem; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 9999;">
-  <div id="chat-header" style="background: #111827; color: white; padding: 10px; font-weight: bold;">Chat Discussion</div>
-  <div id="chat-messages" style="height: 300px; padding: 10px; overflow-y: auto; font-size: 14px; color: white;"></div>
-  <div style="display: flex; border-top: 1px solid #374151;">
-    <input id="chat-input" type="text" placeholder="Parlez à Jarvis..." style="flex: 1; padding: 10px; background: #1f2937; color: white; border: none; outline: none;" />
-    <button onclick="sendMessage()" style="padding: 10px; background: #4c1d95; color: white; border: none;">➤</button>
-    <button id="mic-button" onclick="startVoiceInput()" style="padding: 10px; background: #374151; color: white; border: none;">
-      <span id="mic-icon" style="display: inline-block;">🎙️</span>
-    </button>
+<div id="chat-container">
+  <div id="chat-header">Chat Discussion</div>
+  <div id="chat-messages"></div>
+  <div class="chat-footer">
+    <input id="chat-input" type="text" placeholder="Parlez à Jarvis..." />
+    <button onclick="sendMessage()" style="background:#6d28d9;color:white;">➤</button>
+    <button id="mic-button" onclick="startVoiceInput()"><span id="mic-icon">🎙️</span></button>
   </div>
 </div>
-<elevenlabs-convai agent-id="2oM3VRiQf9V8S45oDWy2"></elevenlabs-convai><script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
-<!-- Script de fonctionnement -->
+
+<elevenlabs-convai agent-id="2oM3VRiQf9V8S45oDWy2"></elevenlabs-convai>
+<script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
 <script>
-const N8N_WEBHOOK_URL = 'https://n8n.srv790185.hstgr.cloud/webhook/n8n'; // Remplacez ceci par votre URL n8n
+const N8N_WEBHOOK_URL = 'https://n8n.srv790185.hstgr.cloud/webhook/n8n';
 
 function toggleChat() {
   const chat = document.getElementById('chat-container');
@@ -49,7 +170,7 @@ async function sendMessage() {
   const userText = input.value.trim();
   if (!userText) return;
 
-  messages.innerHTML += `<div style="text-align: right; margin: 5px;"><span style="background: #4c1d95; padding: 6px 10px; border-radius: 1rem;">${userText}</span></div>`;
+  messages.innerHTML += `<div class="chat-bubble-wrapper" style="justify-content: flex-end;"><span class="chat-bubble user-bubble">${userText}</span></div>`;
   input.value = '';
   messages.scrollTop = messages.scrollHeight;
 
@@ -61,9 +182,9 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    console.log("📦 Réponse reçue de N8N :", data); // 👈 Ajout pour affichage
+    console.log("📦 Réponse reçue de N8N :", data);
     const reply = data.reply || "Jarvis n'a rien à dire. Rare mais possible, monsieur Mickael.";
-    messages.innerHTML += `<div style="text-align: left; margin: 5px;"><span style="background: #374151; padding: 6px 10px; border-radius: 1rem;">${reply}</span></div>`;
+    messages.innerHTML += `<div class="chat-bubble-wrapper" style="justify-content: flex-start;"><span class="chat-bubble bot-bubble">${reply}</span></div>`;
     messages.scrollTop = messages.scrollHeight;
 
     const synth = new SpeechSynthesisUtterance(reply);
@@ -72,7 +193,7 @@ async function sendMessage() {
 
   } catch (error) {
     const errorMsg = "Erreur réseau, monsieur. Probablement pas de mon fait.";
-    messages.innerHTML += `<div style="text-align: left; margin: 5px;"><span style="background: #991b1b; padding: 6px 10px; border-radius: 1rem;">${errorMsg}</span></div>`;
+    messages.innerHTML += `<div class="chat-bubble-wrapper" style="justify-content: flex-start;"><span class="chat-bubble error-bubble">${errorMsg}</span></div>`;
     messages.scrollTop = messages.scrollHeight;
   }
 }
