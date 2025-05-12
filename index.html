@@ -61,12 +61,11 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    const reply = data.reply || "Jarvis n'a rien à dire. Rare mais possible, monsieur.";
-
-    messages.innerHTML += `<div style="text-align: left; margin: 5px;"><span style="background: #374151; padding: 6px 10px; border-radius: 1rem;">${reply}</span></div>`;
+    const output = (Array.isArray(data) && data[0]?.output) || data.output || "Jarvis n'a rien à dire. Rare mais possible, monsieur.";
+    messages.innerHTML += `<div style="text-align: left; margin: 5px;"><span style="background: #374151; padding: 6px 10px; border-radius: 1rem;">${output}</span></div>`;
     messages.scrollTop = messages.scrollHeight;
 
-    const synth = new SpeechSynthesisUtterance(reply);
+    const synth = new SpeechSynthesisUtterance(output);
     synth.lang = 'fr-FR';
     window.speechSynthesis.speak(synth);
 
