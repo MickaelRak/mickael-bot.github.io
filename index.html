@@ -62,7 +62,7 @@ async function sendMessage() {
 
     const data = await response.json();
     console.log("📦 Réponse reçue de N8N :", data); // 👈 Ajout pour affichage
-    const reply = Array.isArray(data) && data[0]?.reply ? data[0].reply : "Jarvis n'a rien à dire. Rare mais possible, monsieur Mickael RAKOTOMALALA."
+    const reply = data.reply || "Jarvis n'a rien à dire. Rare mais possible, monsieur Mickael.";
     messages.innerHTML += `<div style="text-align: left; margin: 5px;"><span style="background: #374151; padding: 6px 10px; border-radius: 1rem;">${reply}</span></div>`;
     messages.scrollTop = messages.scrollHeight;
 
